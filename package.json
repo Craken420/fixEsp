@@ -1,0 +1,17 @@
+{
+  "name": "fixEsp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "fixEsp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chardet": "^0.7.0",
+    "edit-file": "^0.3.0",
+    "iconv-lite": "^0.4.24"
+  }
+}
