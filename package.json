@@ -12,6 +12,7 @@
   "dependencies": {
     "chardet": "^0.7.0",
     "edit-file": "^0.3.0",
-    "iconv-lite": "^0.4.24"
+    "iconv-lite": "^0.4.24",
+    "replace-in-file": "^3.4.4"
   }
 }

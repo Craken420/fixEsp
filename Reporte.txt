@@ -1,0 +1,166 @@
+
+************************************
+Version.frm
+************************************
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.PerfilDBMail]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail
+EnBarraHerramientas=S
+EspacioPrevio=S
+Activo=S
+Visible=S
+GuardarAntes=S
+TipoAccion=Formas
+ClaveAccion=CFDFlexPerfilDBMail
+
+-------------------
+Create file: Version1_FRM_MAVI.esp
+
+Add New Comp: 
+[Version1.frm/Acciones.PerfilDBMail]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail
+EnBarraHerramientas=S
+EspacioPrevio=S
+Activo=S
+Visible=S
+GuardarAntes=S
+TipoAccion=Formas
+ClaveAccion=CFDFlexPerfilDBMail
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.PerfilDBMail]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail
+
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+Colition fields: 
+Nombre=PerfilDBMail,Boton=84,NombreDesplegar=&Perfil DBMail
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.other]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail}
+
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+
+Add New Comp: 
+[Version1.frm/Acciones.other]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail}
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.other]
+Nombre=changeother
+EnBarraHerramientas=S
+EspacioPrevio=S
+ 
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+
+Exist Comp: [Version1.frm/Acciones.other]
+New Field In Exist Comps: 
+EnBarraHerramientas=S
+
+Exist Comp: [Version1.frm/Acciones.other]
+New Field In Exist Comps: 
+EspacioPrevio=S
+Colition fields: 
+Nombre=changeother
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.other2]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail}
+
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+
+Add New Comp: 
+[Version1.frm/Acciones.other2]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail}
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.other2]
+Nombre=changeother
+EnBarraHerramientas=S
+EspacioPrevio=S
+
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+
+Exist Comp: [Version1.frm/Acciones.other2]
+New Field In Exist Comps: 
+EnBarraHerramientas=S
+
+Exist Comp: [Version1.frm/Acciones.other2]
+New Field In Exist Comps: 
+EspacioPrevio=S
+Colition fields: 
+Nombre=changeother
+
+-------------------------Comp OutSide:
+[Version1.frm/Acciones.PerfilDBMail]
+Nombre=ola
+
+
+-------------------
+Exist File: Version1_FRM_MAVI.esp
+Colition fields: 
+Nombre=ola
+
+-------------------------Comp OutSide:
+[Version2.frm/Acciones.PerfilDBMail]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail
+
+-------------------
+Create file: Version2_FRM_MAVI.esp
+
+Add New Comp: 
+[Version2.frm/Acciones.PerfilDBMail]
+Nombre=PerfilDBMail
+Boton=84
+NombreDesplegar=&Perfil DBMail
+
+-------------------------Comp OutSide:
+[Version2.frm/Acciones.PerfilDBMail]
+ClaveAccion=Se encontraba en ActivoFCat
+ClaveAccion=Se encontraba en ActivoFCat
+ClaveAccion=Se encontraba en ActivoFCat
+
+-------------------
+Exist File: Version2_FRM_MAVI.esp
+
+Exist Comp: [Version2.frm/Acciones.PerfilDBMail]
+New Field In Exist Comps: 
+ClaveAccion=Se encontraba en ActivoFCat
+Colition fields: 
+ClaveAccion=Se encontraba en ActivoFCat,ClaveAccion=Se encontraba en ActivoFCat
+
+-------------------------Comp OutSide:
+[Version3.frm/Acciones.PerfilDBMail]
+ClaveAccion=Se encontraba en ActivoFCat
+ClaveAccion=Se encontraba en ActivoFCat
+ClaveAccion=Se encontraba en ActivoFCat
+ 
+-------------------
+Create file: Version3_FRM_MAVI.esp
+
+Add New Comp: 
+[Version3.frm/Acciones.PerfilDBMail]
+ClaveAccion=Se encontraba en ActivoFCatColition fields: 
+ClaveAccion=Se encontraba en ActivoFCat,ClaveAccion=Se encontraba en ActivoFCat
