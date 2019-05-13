@@ -32,7 +32,6 @@ const verifyAndToEsp = paths => (DrkBx.intls.patt.abbrtObjBtwnLowScripts)
     ? toEsp(paths) : DrkBx.mix.cls.pthRoot(paths).replace(/(\_|\.).*/g, '')
 
 const delEmpty = path => {
-    // console.log('delete: ', fileIsEmpty(path))
     if (fileIsEmpty(path) == '') {
         console.log('delete: ', path)
         fs.unlinkSync(path)
@@ -87,14 +86,12 @@ const isntExstCreate = (comps, key) => {
 }
 
 const addCmp = R.curry( (comp, text) => {
-    // console.log(comp)
     if (DrkBx.intls.fnCmp.checkExstHeadCmpInTxt(comp,text)) {
         text = DrkBx.intls.fnCmp.addCmpExst(comp, text)
     }
     else {
         text = DrkBx.intls.fnCmp.addCmpInexst(comp,text)
     }
-    // console.log(text)
     return text
 })
 
@@ -103,7 +100,6 @@ const addCmps = R.curry( (comps, nameFile) => {
     comps.forEach(comp => {
         text = addCmp(comp, text)
     })
-    // fs.writeFileSync('Testing\\' + key, text, 'Latin1')
     return text
 })
 
@@ -118,7 +114,8 @@ const clean = path => {
 }
 
 const delIfHasntCmp = path => {
-    if (DrkBx.intls.fnCmp.hasntComp(DrkBx.mix.fls.gtLtnTxt(path))) {
+    if (!/^\[.*?\]((\n|\r)(?!(\n|)^\[.+?\]).*?$)+/gm.test(DrkBx.mix.fls.gtLtnTxt(path))) {
+        console.log('delete: ', path)
         fs.unlinkSync(path)
         return { file: path, Status: 'Delete'}
     } else {
@@ -142,18 +139,13 @@ const lols = R.pipe(
 )
 
 const combine = path => {
-    // console.log(path)
-    // if ( delEmpty(path) ) {
-        lols(path)
-        lsjd(path)
-        // console.log(delIfHasntCmp(path))
-    // }
-    // clean(path)
-    // 
+    lols(path)
+    lsjd(path)
 }
 
 espFiltFls('.esp', rootData).forEach(file => {
     combine(file)
 })
+
 // espFiltFls('.esp', rootData)
 // combine('Testing\\ActivoFCat_FRM_MAVI.esp')
