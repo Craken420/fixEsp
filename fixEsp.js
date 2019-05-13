@@ -1,228 +1,159 @@
 const fs = require('fs')
+const path = require('path')
+const R = require('ramda')
 
-const { adapt } = require('./Utilities/RegExp/adapt')
-const cls = require('./Utilities/RegExp/cls')
-const take = require('./Utilities/RegExp/take')
+const { DrkBx } = require('./DarkBox/index')
 
-const code = require('./Utilities/Mix/Coding/codingFile')
-const { fileExists } = require('./Utilities/Mix/Verify/fileExist')
-const { getFiles } = require('./Utilities/Mix/PathWay/getFiles')
-const { nameFile } = require('./Utilities/Intls/Components/nameFileInCmp')
-const newPath = require('./Utilities/Intls/PathWay/newPath')
-const supr = require('./Utilities/Mix/PathWay/deleteFile')
+const rootData = 'Testing\\'
 
-const { asComp } = require('./Utilities/Intls/Components/asComp')
-const duplex = require('./Utilities/Mix/Array/duplicate')
-const { isNewOrExistPro } = require('./Utilities/Intls/Fields/isNewOrExist')
+const cnctRootEsp = R.map(file => rootData + file)
 
-const dir = 'Testing\\'
-// const dir = 'C:\\Users\\lapena\\Documents\\Luis Angel\\Sección Mavi\\Intelisis\\Intelisis5000\\Reportes MAVI\\'
+const omitFls = R.without( cnctRootEsp( ['Personal_TBL_MAVI.esp'] ) )
 
-function proccesComponentExist(comp, pathFile) {
+const print = value => {
+    console.log(value)
+    return value
+}
 
-    let headNewComp = take.intls.comp.head(comp)
+const fileIsEmpty = R.pipe(
+    fs.readFileSync,
+    R.toString
+)
 
-    if(headNewComp) {
+const toEsp = R.pipe(
+    path.parse,
+    R.prop('name'),
+    R.replace(/_MAVI/gi, ''),
+    DrkBx.mix.change.lastLowScriptToPoint,
+    R.replace(DrkBx.mix.patt.pthExt, R.toLower)
+)
 
-        let newCompFields = take.intls.field.full(comp)
+const verifyAndToEsp = paths => (DrkBx.intls.patt.abbrtObjBtwnLowScripts)
+    ? toEsp(paths) : DrkBx.mix.cls.pthRoot(paths).replace(/(\_|\.).*/g, '')
 
-        if (newCompFields) {
-            let crashFields = []
-            newCompFields.forEach(fieldSend => {
-
-                let olderComp = take.intls.comp.byName(
-                    headNewComp.join(''),
-                    code.getTxtInOriginCoding(pathFile).replace(/^\n+/gm, '\n')
-                )
-
-                if (olderComp) {
-
-                    olderComp =  duplex.del(olderComp)
-
-                    if (olderComp.length != 0) {
-                        if (!isNewOrExistPro(fieldSend, olderComp.join('\n'))) {
-                           
-                            let rgxAddField = new RegExp(`(?<=\\[\\b${adapt.toRegExp(headNewComp.join(''))}\\b\\])`,`g`)
-
-                            fs.appendFileSync('Reporte.txt','\n\nExist Comp: [' + headNewComp.join('') + ']')
-                            fs.appendFileSync('Reporte.txt','\nNew Field In Exist Comps: \n' + fieldSend)
-                           
-                            fs.writeFileSync(pathFile, code.getTxtInOriginCoding(pathFile).replace(rgxAddField, '\n' + fieldSend), 'latin1')
-                
-                        } else {
-                            crashFields.push(fieldSend)
-                        }
-                    }
-                }
-            })
-            if (crashFields) {
-                if (crashFields.length != 0) {
-
-                    fs.appendFileSync('Reporte.txt','\nColition fields: \n' + crashFields)
-                
-                    let colitiontext = `\n;Campos Colisionados\n;[${headNewComp.join('')}]\n${crashFields.map(x => x.replace(/^/, ';')).join('\n') + '\n'}`
-                    
-                    fs.appendFileSync(pathFile, colitiontext)
-                    
-                }
-            }
-        }
+const delEmpty = path => {
+    // console.log('delete: ', fileIsEmpty(path))
+    if (fileIsEmpty(path) == '') {
+        console.log('delete: ', path)
+        fs.unlinkSync(path)
+        return ''
+    } else {
+        return path
     }
 }
 
-function proccesComponentNotExist(comp, headNewComp, pathFile){
+const espFiltFls = R.pipe(
+    DrkBx.mix.fls.getFiltFls,
+    omitFls,
+    R.map(delEmpty),
+    R.filter(Boolean)
+)
 
-    fs.appendFileSync(pathFile, '\n[' + headNewComp + ']\n')
+const cmpToObj = cmp => R.objOf( DrkBx.intls.take.cmpHead(cmp), DrkBx.intls.fnObj.fldsToObj(cmp) )
+const cmpToObjWithBrakets = cmp => R.objOf('[' + DrkBx.intls.take.cmpHead(cmp) + ']', DrkBx.intls.fnObj.fldsToObj(cmp) )
 
-    let newCompFields = take.intls.field.full(comp)
-
-    fs.appendFileSync('Reporte.txt','\n\nAdd New Comp: \n[' + headNewComp + ']')
-
-    if (newCompFields) {
-
-        let colition = []
-        newCompFields.forEach(field => {
-            if (new RegExp (`^${take.intls.field.name(field)}=`, `gm`).test(
-                    take.intls.comp.byName(
-                        headNewComp,
-                        code.getTxtInOriginCoding(pathFile).replace(/^\n+/gm, '\n')
-                    ).join(''))
-                ) {
-
-                colition.push(field)
-            } else {
-                fs.appendFileSync('Reporte.txt', '\n' + field)
-                fs.appendFileSync(pathFile, field + '\n')
-            }
-        })
-
-        if (colition) {
-            if (colition.length != 0) {
-                fs.appendFileSync('Reporte.txt','Colition fields: \n' + colition)
-                let textToSend =  `\n;Campos Colisionados\n;[${headNewComp}]\n${colition.map(x => x.replace(/^/, ';')).join('\n') + '\n'}`
-                fs.appendFileSync(pathFile,textToSend)
-            }
-        }
-    }
-    // console.log('\nFinish Content: \n',code.getTxtInOriginCoding(pathFile), '\n-------------------')
+const uniqObjs = array => {
+    const newObj = {}
+    array.forEach(x => Object.assign(newObj, R.mergeDeepRight(newObj, x)))
+    return newObj
 }
 
-function addComponent(compsOutSide, nameFile, pathFile) {
+const gtUniqCmpsOutSide = R.pipe(
+    DrkBx.intls.take.cmpOutSide,
+    R.filter(Boolean),
+    R.map(cmpToObj),
+    uniqObjs,
+    DrkBx.intls.fnObj.cmpsToTxt,
+)
 
-    let newComps = take.intls.comp.byNameFile(nameFile, compsOutSide.join('\n'))
+const rootEsp = '../../../Intelisis/Intelisis5000/Reportes MAVI\\'
+const rootOrig = '../../../Intelisis/Intelisis5000/Codigo Original\\'
 
-    newComps.forEach(comp => {
+const proccessFile = pathFile => {
+    return gtUniqCmpsOutSide( verifyAndToEsp(pathFile), DrkBx.mix.fls.gtLtnTxt(pathFile) )
+}
 
-        let headNewComp = take.intls.comp.head(comp)
+const nameFile = cmp => DrkBx.intls.newPath.espToMavi(DrkBx.intls.take.cmpNameFile(cmp).join(''))
 
-        if(headNewComp) {
+const addIndex = cmp => R.objOf(nameFile(cmp), cmpToObj(cmp))
 
-            let rgxHead = new RegExp(`^\\[\\b${adapt.toRegExp(headNewComp.join(''))}\\b\\]`, `gm`)
-
-            if (!rgxHead.test(code.getTxtInOriginCoding(pathFile))) {
-                proccesComponentNotExist(comp, headNewComp.join(''), pathFile)
-            } else {
-                proccesComponentExist(comp, pathFile)
-            }
+const isntExstCreate = (comps, key) => {
+    if (comps.length != 0) {
+        if (!DrkBx.mix.fls.exist('Testing\\' + key)) {
+            fs.writeFileSync('Testing\\' + key, 'Reacomodo:\n\n')
         }
+    }
+    return comps
+}
+
+const addCmp = R.curry( (comp, text) => {
+    // console.log(comp)
+    if (DrkBx.intls.fnCmp.checkExstHeadCmpInTxt(comp,text)) {
+        text = DrkBx.intls.fnCmp.addCmpExst(comp, text)
+    }
+    else {
+        text = DrkBx.intls.fnCmp.addCmpInexst(comp,text)
+    }
+    // console.log(text)
+    return text
+})
+
+const addCmps = R.curry( (comps, nameFile) => {
+    let text = DrkBx.mix.fls.gtLtnTxt('Testing\\' + nameFile)
+    comps.forEach(comp => {
+        text = addCmp(comp, text)
     })
-}
+    // fs.writeFileSync('Testing\\' + key, text, 'Latin1')
+    return text
+})
 
-function oddComponent(comp, pathFile) {
 
-    let headNewComp = take.intls.comp.head(comp)
-    // console.log(headNewComp)
-    if(headNewComp) {
-
-        let rgxHead = new RegExp(`^\\[\\b${adapt.toRegExp(headNewComp.join(''))}\\b\\]`, `gm`)
-
-        if (!rgxHead.test(code.getTxtInOriginCoding(pathFile))) {
-            proccesComponentNotExist(comp, headNewComp.join(''), pathFile)
-        } else {
-            proccesComponentExist(comp, pathFile)
-        }
+const clean = path => {
+    if (DrkBx.intls.make.outSide(DrkBx.intls.newPath.maviToEsp(path)).test(DrkBx.mix.fls.gtLtnTxt(path))) {
+        fs.writeFileSync(path, DrkBx.intls.cls.outSide(DrkBx.intls.newPath.maviToEsp(path), DrkBx.mix.fls.gtLtnTxt(path)), 'Latin1')
+        return path
+    } else {
+        return path
     }
-
 }
 
-getFiles(dir, ['.esp'])
-    .then(files => {
+const delIfHasntCmp = path => {
+    if (DrkBx.intls.fnCmp.hasntComp(DrkBx.mix.fls.gtLtnTxt(path))) {
+        fs.unlinkSync(path)
+        return { file: path, Status: 'Delete'}
+    } else {
+        return { file: path, Status: 'HasComp'}
+    }
+}
 
-        files.forEach(file => {
+const lsjd = R.pipe(
+    clean,
+    delIfHasntCmp
+)
 
-            if (file != dir + 'Personal_TBL_MAVI.esp') {
-                // if (file == dir + 'ActivarDesafectar.esp' || file == dir + 'MonederoElectronico.esp'|| file == dir + 'UEN.esp'|| file == dir + 'ArtConDisponible_ANEXO_MAVI.esp'||file == dir + 'VentaT_Mayor12Meses.esp'||file == dir + 'EliminarConta.esp') {
-                if (supr.deleteEmptyFile(file)) {
-                    return
-                } else {
-                    let pathEsp = newPath.maviToEsp(file)
+const lols = R.pipe(
+    proccessFile,
+    R.map(addIndex),
+    uniqObjs,
+    R.map(DrkBx.intls.fnObj.cmpsToTxt),
+    R.forEachObjIndexed(isntExstCreate),
+    R.mapObjIndexed(addCmps),
+    R.forEachObjIndexed( (text, path) => fs.writeFileSync('Testing\\' +path, text, 'Latin1')),
+)
 
-                    let txt = code.getTxtInOriginCoding(file)
+const combine = path => {
+    // console.log(path)
+    // if ( delEmpty(path) ) {
+        lols(path)
+        lsjd(path)
+        // console.log(delIfHasntCmp(path))
+    // }
+    // clean(path)
+    // 
+}
 
-                    if (pathEsp){
-                        fs.appendFileSync('Reporte.txt',
-                                '\n************************************\n' 
-                                + pathEsp
-                                + '\n************************************'
-                            )
-                        let compsOutSide = take.intls.comp.outSide(pathEsp, cls.intls.comments(txt))
-
-                        if (compsOutSide) {
-                            
-                            compsOutSide.forEach(outComp => {
-                                // console.log(outComp)
-                                fs.appendFileSync('Reporte.txt',
-                                    '\n\n-------------------------'
-                                    + 'Comp OutSide:\n'
-                                    + outComp
-                                    +'\n-------------------'
-                                )
-                                let nameFileInCmp = nameFile(outComp)
-                                console.log('nameFileInCmp: ',nameFileInCmp)
-                                // let namesFiles = duplex.del(nameFileInComp(compsOutSide))
-                                
-                                // if (namesFiles) {
-
-                                //     namesFiles.forEach(nameFile => {
-
-                                //         if (nameFile) {
-    
-                                let newPathComp = newPath.espToMavi(nameFileInCmp)
-                                // console.log('newPathComp: ',newPathComp)
-                                if (!fileExists(dir + newPathComp)) {
-                                    fs.appendFileSync('Reporte.txt','\nCreate file: ' + newPathComp)
-                                    fs.writeFileSync(dir + newPathComp, ';*** 22-03-19 Reacomodo de los archivos especiales\n', 'latin1')
-                                //     addComponent(compsOutSide, nameFile, dir + newPathComp)
-                                } else {
-                                    fs.appendFileSync('Reporte.txt','\nExist File: ' + newPathComp)
-                                }
-                                
-                                oddComponent(outComp, dir + newPathComp)
-                                // addComponent(compsOutSide, nameFile, dir + newPathComp)
-
-
-                                            
-
-                                //         }
-                                //     })
-                                // }
-                                fs.writeFileSync(file, cls.intls.comp.outSide(pathEsp, txt), 'latin1')
-
-                            })
-                            if (!asComp(file)) {
-                                fs.appendFileSync('Reporte.txt',
-                                    '\n_______________'
-                                    + '\nNo Comp: Delete: ' 
-                                    + file.replace(/.*\/|.*\\/, '')
-                                    +'\n_______________'
-                                )
-                                fs.unlinkSync(file)
-                            }
-                        }
-                    }
-                }
-                //}
-            }
-        })
-    })
-    .catch(e => console.error(e))
+espFiltFls('.esp', rootData).forEach(file => {
+    combine(file)
+})
+// espFiltFls('.esp', rootData)
+// combine('Testing\\ActivoFCat_FRM_MAVI.esp')
